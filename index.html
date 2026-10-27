@@ -202,6 +202,18 @@ details.legal[open] .chev{transform:rotate(180deg)}
 (function(){
   var ENDPOINT = 'https://formspree.io/f/VOTRE_ID';
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // toujours ouvrir en haut de page, même depuis un favori avec une ancre (#beta…)
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  window.scrollTo(0, 0);
+  window.addEventListener('load', function(){ window.scrollTo(0, 0); });
+  // liens internes : défiler sans ajouter l'ancre à l'URL
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click', function(ev){
+    var t = document.querySelector(a.getAttribute('href')); if (!t) return;
+    ev.preventDefault();
+    if (t.tagName === 'DETAILS') t.open = true;
+    t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  }); });
   // étapes au scroll
   var steps = document.querySelectorAll('[data-step]');
   function setStep(i){
@@ -225,8 +237,6 @@ details.legal[open] .chev{transform:rotate(180deg)}
       io2.observe(band);
     }
   }
-  // mentions légales : ouvrir le bloc visé
-  document.querySelectorAll('.open-legal').forEach(function(a){ a.addEventListener('click', function(){ var d = document.querySelector(a.getAttribute('href')); if (d) d.open = true; }); });
   // formulaire
   var f = document.getElementById('beta-form'), msg = document.getElementById('form-msg'), btn = document.getElementById('submit-btn');
   f.addEventListener('submit', function(ev){
